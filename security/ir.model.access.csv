@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_reclamation_user,access_reclamation_user,model_reclamation,base.group_user,1,1,1,1
+access_satisfaction_user,access_satisfaction_user,model_satisfaction_survey,base.group_user,1,1,1,1
+access_dashboard_user,access_dashboard_user,model_reclamation_dashboard,base.group_user,1,1,1,1

@@ -1,0 +1,838 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+
+        <!-- Reclamation Related Views -->
+        <record id="action_reclamation_list" model="ir.actions.act_window">
+            <field name="name">Réclamations</field>
+            <field name="res_model">reclamation</field>
+            <field name="view_mode">tree,form,search</field>
+<field name="context">{"search_default_NotArchived":1}</field>
+
+            <!-- <field name="domain">[('active', '=', True)]</field> -->
+        </record>
+
+        <record id="action_reclamation_graph" model="ir.actions.act_window">
+    <field name="name">Statistiques par Type</field>
+    <field name="res_model">reclamation</field>
+    <field name="view_mode">graph</field>
+</record>
+
+
+
+   <record id="view_reclamation_graph" model="ir.ui.view">
+    <field name="name">reclamation.graph</field>
+    <field name="model">reclamation</field>
+    <field name="arch" type="xml">
+        <graph string="Statistiques des Réclamations" type="bar">
+            <!-- Répartition des réclamations par type -->
+            <field name="archived" type="row"/>
+            <field name="id" type="measure" string="Resolved"/>
+            <field name="type2" type="row"/> <!-- Axe des catégories -->
+            <field name="id" type="measure"/> <!-- Nombre total de réclamations -->
+
+            <!-- Indicateur pour le taux de résolution -->
+            
+        </graph>
+        
+    </field>
+</record>
+
+        <record id="action_intervention" model="ir.actions.act_window">
+            <field name="name">Réclamations</field>
+            <field name="res_model">project.project</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="context">{}</field>
+</record>
+
+        <record id="view_reclamation_form" model="ir.ui.view">
+            <field name="name">reclamation.form</field>
+            <field name="model">reclamation</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="id" string="Numéro de rélamation"/>
+                        <field name="create_uid" string="Agent clientèle"/>
+                        <field name="nom_reclament"/>
+                        <field name="prenom_reclament"/>
+                        <field name="numero_tel" widget="phone"/>
+                        <field name="adresse_mail"/>
+                        <field name="objet" string="Nom de la réclamation" />
+                        <field name="description" string="Description de la réclamation" />
+                        <field name="priority" string="Urgence de la réclamation" groups="reclamation.group_respo_reclamation" />
+                        <field name="origin" string="Origin de la réclamation"/>
+                        <field name="type2" string="Type de la réclamation" groups="reclamation.group_respo_reclamation"/>
+                        <field name="file" string="Fichiers justificatifs"/>
+                        <field name="treated" string="Traitée"/>
+                        <field name="source"/>
+                        
+                    </group>
+                    <button name="action_archive" type="object" string="Archive" class="oe_highlight" icon="fa fa-archive"/>
+
+                </form>
+
+            </field>
+
+        </record>
+        <record id="view_satifaction_form" model="ir.ui.view">
+            <field name="name">satisfaction.form</field>
+            <field name="model">satisfaction.survey</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                  
+                        <field name="ref" />
+                        <field name="prenom_reclament" />
+                        <field name="nom_reclament"/>
+                        <field name="prenom_reclament"/>
+                        <field name="satisfaction_rating" />
+                        <field name="professionalism"/>
+                        <field name="recommend"  />
+                        <field name="treatment_time"  />
+                        <field name="clarity"/>
+                        <field name="comments" />
+                        <field name="consent" />
+ 
+                    </group>
+
+
+                </form>
+
+            </field>
+
+        </record>
+
+        <record id="view_reclamation_search" model="ir.ui.view">
+            <field name="name">reclamation.search</field>
+            <field name="model">reclamation</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="origin"/>
+                    <field name="type2"/>
+                    <field name="archived"/>
+                    <field name="id"/>
+                    <field name="create_uid"/>
+                    <filter name="Archived" string="Reclamations archivées" domain="[('archived', '=', True)]"/>
+                    <filter name="NotArchived" context="{'default_active': True}" string="Reclamations actives" domain="[('archived', '=', False)]"/>
+
+                    <group expand="1" string="Reclamation par type ">
+                        <filter name="group_by_type2" string="Réclamation par type" context="{'group_by': 'type2'}"/>
+                    </group> 
+                    <group expand="1" string="Reclamation par origine ">
+                        <filter name="group_by_origin" string="Reclamation par origine" context="{'group_by': 'origin'}"/>
+                    </group>
+                    <group expand="1" string="Reclamation par agent clientèle ">
+                        <filter name="group_by_created" string="Reclamation par agent clientèle" context="{'group_by': 'create_uid'}"/>
+                    </group>
+                    <group expand="1" string="Group by Traitement">
+                        <filter name="group_by_archived" string="By Treated" context="{'group_by': 'archived'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+         <record id="view_reclamation_tree" model="ir.ui.view">
+    <field name="name">reclamation.tree</field>
+    <field name="model">reclamation</field>
+    <field name="arch" type="xml">
+        <tree>
+            <field name="id"/>
+            <field name="create_uid"/>
+            <field name="origin"/>
+            <field name="type2"/>
+        </tree>
+    </field>
+</record>
+
+
+        <!-- Project Related Views -->
+        <record id="view_project_tree_inherit" model="ir.ui.view">
+            <field name="name">project.reclamations.tree.inherit</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="replace">
+                    <tree string="Réclamations">
+                        <field name="date_reclamation"/>
+                        <field name="objet"/>
+                        <field name="priority"/>
+                        <field name="type2"/>
+                        <field name="treated"/>
+                    </tree>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_project_kanban_inherit" model="ir.ui.view">
+            <field name="name">project.project.kanban.inherit</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project_config_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//t[@t-name='kanban-box']/*" position="inside">
+                    <div class="oe_kanban_details">
+                        <div>Name: <field name="name" required="1"/></div>
+                        <div>Date: <field name="date_reclamation"/></div>
+                        <div style="color: red;">Priorité: <field name="priority"/></div>
+                        <div>Type: <field name="type2"/></div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+       <!-- PV Report -->
+<record id="report_pv" model="ir.actions.report">
+    <field name="name">PV Report</field>
+    <field name="model">project.project</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">reclamation.report_pv_template</field>
+    <field name="report_file">reclamation.report_pv</field>
+    <field name="binding_model_id" ref="project.model_project_project"/>
+    <field name="binding_type">report</field>
+</record>
+
+<!-- Template for PV Report -->
+<template id="report_pv_template">
+    <t t-call="web.html_container">
+        <t t-foreach="doc_ids" t-as="doc">
+            <t t-set="record" t-value="env['project.project'].browse(doc)"/>
+            <h1>Rapport PV</h1>
+            <p><t t-esc="record.pv"/></p>
+        </t>
+    </t>
+</template>
+
+<!-- Accuse Report -->
+<record id="report_accuse" model="ir.actions.report">
+    <field name="name">Accuse</field>
+    <field name="model">reclamation</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">reclamation.report_accuse_template</field>
+    <field name="report_file">reclamation.report_accuse</field>
+    <field name="binding_model_id" ref="model_reclamation"/>
+    <field name="binding_type">report</field>
+</record>
+
+<template id="report_accuse_template">
+    <t t-call="web.html_container">
+        <!-- Add style for the report -->
+        <style>
+            @page {
+                size: auto;
+                margin: 20mm;
+            }
+
+            h1 {
+                color:rgb(34, 101, 173);  
+                font-size: 30px;
+                font-weight: bold;
+                border-bottom: 2px solidrgb(9, 48, 89); 
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }
+
+            p {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            strong {
+                font-weight: bold;
+            }
+
+            .date-footer {
+                font-size: 16px;
+                margin-top: 40px;
+                font-style: italic;
+            }
+        </style>
+
+        <!-- Main title with blue color and line under it -->
+        <h1>Accuse de reception de la reclamation</h1>
+
+        <!-- Use t-foreach to iterate through the records -->
+        <t t-foreach="doc_ids" t-as="doc">
+            <t t-set="record" t-value="env['reclamation'].browse(doc)"/>
+
+            <!-- Display the fields -->
+            <p><strong>Nom du reclamant:</strong> <span t-esc="record.nom_reclament"/></p>
+            <p><strong>Prenom du reclamant:</strong> <span t-esc="record.prenom_reclament"/></p>
+            <p><strong>Reference de la reclamation:</strong> <span t-esc="record.id"/></p>
+            <p><strong>Description de la reclamation:</strong> <span t-esc="record.description"/></p>
+        </t>
+
+        <!-- Date generation footer -->
+        <div class="date-footer">
+            <p><strong>Date de generation:</strong> <span t-esc="time.strftime('%d/%m/%Y %H:%M:%S')"/></p>
+        </div>
+    </t>
+</template>
+
+
+
+
+<record id="action_generate_download_accuse" model="ir.actions.server">
+    <field name="name">Télécharger accusé de réception</field>
+    <field name="model_id" ref="model_reclamation"/>
+    <field name="state">code</field>
+    <field name="code">
+        action = env.ref('reclamation.report_accuse').report_action(self)
+    </field>
+</record>
+
+
+<record id="action_generate_download_pv" model="ir.actions.server">
+    <field name="name">Generate and Download PV</field>
+    <field name="model_id" ref="project.model_project_project"/>
+    <field name="state">code</field>
+    <field name="code">
+        action = env.ref('reclamation.report_pv').report_action(self)
+    </field>
+</record>
+
+
+
+
+
+        <record id="view_project_form_inherit" model="ir.ui.view">
+            <field name="name">project.project.form.inherit</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet/group" position="replace">
+                    <group string="Informations Générales">
+                        <field name="active" invisible="1"/>
+                        <field name="cheffe" string="Chef/fe de projet" widget="many2one_avatar_user" readonly="not active" domain="[('share', '=', False)]" options="{'no_quick_create': True}"/>
+                        <field name="partner_id" invisible="1"/>
+                        <field name="name" required="1"/>
+                        <field name="users_id" string="Membres de lequipe"/>
+                        <field name="date_reclamation" required="1"/>
+                        <field name="status" />
+                        <field name="objet" required="1"/>
+                        <field name="priority"/>
+                        <field name="type2"/>
+                    </group>
+                    <group string="Reclamant">
+                        <field name="nom_reclament" required="1"/>
+                        <field name="prenom_reclament" required="1"/>
+                        <field name="numero_tel" required="1"/>
+                        <field name="adresse_mail"/>
+                        <field name="nom_entreprise"/>
+                    </group>
+                    <group string="Détails de la Réclamation">
+                        <field name="description" colspan="2"/>
+                        <field name="file" filename="attachment_name"/>
+                        <field name="origin"/>
+                        <field name="source"/>
+                    </group>
+                    <group string="Statut">
+                        <field name="treated"/>
+                        <field name="pv"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Task Related Views -->
+        <record id="view_task_form_inherit" model="ir.ui.view">
+    <field name="name">project.task.form.inherit</field>
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.view_task_form2"/>
+    <field name="arch" type="xml">
+        
+        <!-- Replace the default group with a customized group -->
+        <xpath expr="//group" position="replace">
+            <group>
+                <field name="active" invisible="1"/>
+                 <field name="cheffe" string="Chef/f de l'équipe d’intervention" widget="many2one_avatar_user" readonly="not active" domain="[('share', '=', False)]" options="{'no_quick_create': True}"/>
+
+                <field name="name"/>
+                <field name="status"/>
+                <field name="planned_date"/>
+                <field name="date_assign"/>
+                <field name="date_end"/>
+                <field name="description"/>
+                <field name="additional_comments"/>
+                <field name="user_ids" widget="many2many_tags"/>
+                <field name="attachment_ids" widget="many2many_binary"/>
+                <field name="report" colspan="2"/>
+                <field name="milestone_id" invisible="1"/>
+                <field name="partner_id"/>
+            </group>
+        </xpath>
+
+        <!-- Replace the sub_tasks_page with a custom page -->
+        <xpath expr="//page[@name='sub_tasks_page']" position="replace">
+            <page name="sub_tasks_page" string="Actions Réalisées" invisible="not project_id">
+                <field name="child_ids" context="{
+                    'default_project_id': project_id,
+                    'default_display_in_project': False,
+                    'default_user_ids': user_ids,
+                    'default_parent_id': id,
+                    'default_partner_id': partner_id,
+                    'default_milestone_id': allow_milestones and milestone_id
+                }" widget="subtasks_one2many">
+                    <tree editable="bottom" decoration-muted="state in ['1_done', '1_canceled']" open_form_view="True">
+                        <field name="allow_milestones" column_invisible="True"/>
+                        <field name="display_in_project" column_invisible="True" force_save="1"/>
+                        <field name="sequence" widget="handle"/>
+                        <field name="id" optional="hide"/>
+                        <field name="parent_id" column_invisible="True"/>
+                        <field name="priority" widget="priority" nolabel="1" options="{'autosave': False}" width="40px"/>
+                        <field name="state" widget="project_task_state_selection" nolabel="1" options="{'autosave': False}" width="40px"/>
+                        <field name="name" widget="name_with_subtask_count"/>
+                        <field name="subtask_count" column_invisible="True"/>
+                        <field name="closed_subtask_count" column_invisible="True"/>
+                        <field name="project_id" string="Project" optional="hide" options="{'no_open': 1}" widget="project"/>
+                        <field name="milestone_id" optional="hide" context="{'default_project_id': project_id}" column_invisible="not parent.allow_milestones" invisible="not allow_milestones"/>
+                        <field name="partner_id" optional="hide" widget="res_partner_many2one" invisible="not project_id"/>
+                        <field name="user_ids" widget="many2many_avatar_user" optional="show"/>
+                        <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                        <field name="company_id" column_invisible="True"/>
+                        <field name="date_deadline" invisible="state in ['1_done', '1_canceled']" optional="hide" decoration-danger="date_deadline &lt; current_date"/>
+                        <field name="activity_ids" string="Next Activity" widget="list_activity" optional="hide"/>
+                        <field name="my_activity_date_deadline" string="My Deadline" widget="remaining_days" options="{'allow_order': '1'}" optional="hide"/>
+                        <field name="rating_last_text" string="Rating" decoration-danger="rating_last_text == 'ko'" decoration-warning="rating_last_text == 'ok'" decoration-success="rating_last_text == 'top'" class="fw-bold" widget="badge" optional="hide" invisible="rating_last_text == 'none'" column_invisible="True" groups="project.group_project_rating"/>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="hide"/>
+                        <field name="stage_id" optional="hide" context="{'default_project_id': project_id}"/>
+                    </tree>
+                </field>
+            </page>
+        </xpath>
+    </field>
+</record>
+
+
+        <record id="view_task_tree_inherit" model="ir.ui.view">
+            <field name="name">project.task.tree.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_tree2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="replace">
+                    <tree>
+                        <field name="name"/>
+                        <field name="date_assign"/>
+                        <field name="date_end"/>
+                        <field name="status"/>
+                    </tree>
+                </xpath>
+            </field>
+        </record>
+        
+<record id="action_satisfaction" model="ir.actions.act_window">
+<field name="name">Satifactions réponses</field>
+        <field name="res_model">satisfaction.survey</field>
+        <field name="view_mode">tree,form</field>
+        </record>
+        <record id="view_task_kanban_inherit" model="ir.ui.view">
+            <field name="name">project.task.kanban.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//t[@t-name='kanban-box']/*" position="inside">
+                    <div class="oe_kanban_details">
+                        <div>Name: <field name="name"/></div>
+                        <div>Start date: <field name="date_assign"/></div>
+                        <div>End date: <field name="date_end"/></div>
+                        <div style="color: red;">Status: <field name="status"/></div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        
+
+        <!-- Website Templates -->
+        <template id="survey_question_file_upload" name="Survey Question File Upload">
+            <div class="input-group o_survey_form_file o_survey_answer_wrapper p-1 rounded">
+                <input type="file" 
+                       id="file-upload"
+                       class="form-control o_survey_question_file bg-transparent rounded-0 p-0" 
+                       t-att-name="question.id" 
+                       style="display: none;"/>
+                <label class="btn btn-primary text-white" 
+                       for="file-upload" 
+                       style="cursor: pointer;">
+                    <i class="fa fa-upload"/> Upload File
+                </label>
+                <span class="file-name ms-2"></span>
+            </div>
+        </template>
+
+        <template id="survey_question_container_inherit" inherit_id="survey.question_container">
+            <!-- Template content here -->
+        </template>
+
+           <template id="reclamation_form_template" name="Formulaire de réclamation">
+    <t t-call="website.layout">
+        <div class="container mt-5">
+            <form id="reclamation_form" method="post" action="/reclamation/route" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <input type="hidden" name="current_section" t-att-value="current_section or '1'" />
+                <!-- Section 1: Informations sur le réclamant -->
+                <t t-if="current_section == '1'">
+                    <div class="form-section">
+                        <h1 class="text-center">Formulaire de réclamation</h1>
+                        <h3>Informations sur le réclamant</h3>
+                        <div class="form-group">
+                            <label for="nom">Nom du réclamant</label>
+                            <input type="text" id="nom_reclament" name="nom_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('nom_reclament', '')" />
+                        </div>
+                        <div class="form-group">
+                            <label for="prenom">Prénom du réclamant</label>
+                            <input type="text" id="prenom_reclament" name="prenom_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('prenom_reclament', '')" />
+                        </div>
+                        <div class="form-group">
+                            <label for="commune">Commune du réclamant</label>
+                            <input type="text" id="commune_reclament" name="commune_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('commune_reclament', '')"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="numerotel">Numéro de téléphone</label>
+                            <input type="text" id="numero_tel" name="numero_tel" 
+                                   class="form-control" required="true" t-att-value="form_data.get('numero_tel', '')" />
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Adresse électronique</label>
+                            <input type="email" id="email" name="email" 
+                                   class="form-control" t-att-value="form_data.get('adresse_mail', '')"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="origine">Vous êtes</label>
+                            <select id="source" name="source" class="form-control" required="true" t-att-value="form_data.get('source', '')">
+                                <option value="Citoyen" >Citoyen(ne)</option>
+                                <option value="Entreprise">Entreprise</option>
+                            </select>
+                        </div>
+                        <div style="height: 20px;"></div>
+                        <button type="submit" name="next" value="2" class="btn btn-primary">Suivant</button>
+                    </div>
+                </t>
+
+                <!-- Section 2: Détails de la réclamation -->
+                <t t-if="current_section == '2'">
+                    <div class="form-section">
+                        <h1 class="text-center">Formulaire de réclamation</h1>
+                        <h3>Détails de la réclamation</h3>
+                        <!-- Hidden fields for Section 2 -->
+                        <div class="form-group">
+                            <input type="hidden" id="nom_reclament" name="nom_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('nom_reclament', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="prenom_reclament" name="prenom_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('prenom_reclament', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="commune_reclament" name="commune_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('commune_reclament', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="numero_tel" name="numero_tel" 
+                                   class="form-control" required="true" t-att-value="form_data.get('numero_tel', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="email" name="email" 
+                                   class="form-control" t-att-value="form_data.get('adresse_mail', '')" />
+                        </div>
+                        <!-- Hidden source field in Section 2 -->
+                        <div class="form-group">
+                            <input type="hidden" id="source" name="source" 
+                                   t-att-value="form_data.get('source', '')" />
+                        </div>
+                        <div class="form-group">
+                            <label for="objet">Objet de la réclamation</label>
+                            <input type="text" id="objet" name="objet" class="form-control" required="true" />
+                        </div>
+                        <div class="form-group">
+                        <input type="hidden" id="reclamation_id" name="reclamation_id" 
+                             class="form-control"  t-att-value="form_data.get('reclamation_id', '')" />
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description de la réclamation</label>
+                            <textarea id="description" name="description" class="form-control" required="true"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="objet">Fichiers justificatifs</label>
+                            <input type="file" id="file" name="file" class="form-control" />
+                        </div>
+                        <div style="height: 20px;"></div>
+                        <button type="button" onclick="window.location.href='/reclamation/previous'" class="btn btn-primary">Précédent</button>
+                        <button type="submit" name="submit" value="submit" class="btn btn-primary">Soumettre</button>
+                    </div>
+                </t>
+
+                <!-- Section 3: Success Message -->
+                <t t-if="current_section == '3'">
+                    <div class="form-section">
+                    <h3>Votre réclamation a été soumise avec succès !</h3>
+                       <p>Nous vous remercions de votre soumission. Un accusé de réception a été généré et vous pouvez le télécharger ci-dessous.</p>
+                      <p>Nous traiterons votre demande dans les plus brefs délais. Si vous avez des questions supplémentaires, n'hésitez pas à nous contacter.</p>
+                      <div style="height: 20px;"></div>
+  
+                        <div class="form-group">
+                            <input type="hidden" id="nom_reclament" name="nom_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('nom_reclament', '')" />  
+                        </div>
+                        <div class="form-group">
+                         <input type="hidden" id="reclamation_id" name="reclamation_id" 
+                         class="form-control"  t-att-value="form_data.get('reclamation_id', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="prenom_reclament" name="prenom_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('prenom_reclament', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="commune_reclament" name="commune_reclament" 
+                                   class="form-control" required="true" t-att-value="form_data.get('commune_reclament', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="numero_tel" name="numero_tel" 
+                                   class="form-control" required="true" t-att-value="form_data.get('numero_tel', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="email" name="email" 
+                                   class="form-control" t-att-value="form_data.get('adresse_mail', '')" />
+                        </div>
+                        <!-- Hidden source field in Section 3 -->
+                        <div class="form-group">
+                            <input type="hidden" id="source" name="source" 
+                                   t-att-value="form_data.get('source', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="objet" name="objet" t-att-value="form_data.get('object', '')" 
+                                   class="form-control" required="true" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="description" name="description" class="form-control" t-att-value="form_data.get('description', '')" />
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="file" name="file" class="form-control" t-att-value="form_data.get('file', '')"/>
+                        </div>
+                        <div style="height: 20px;"></div>
+                        <button type="submit"  class="btn btn-primary">Télécharger l'accusé de réception de votre réclamation </button>
+                    </div>
+                </t>
+
+            </form>
+        </div>
+    </t>
+</template>
+
+
+<!-- satisfaction -->
+ <template id="reclamation_satisfaction_template" name="Satisfaction Form">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card p-4">
+                            <h3 class="text-center">Merci de votre confiance !</h3>
+                            <p>Votre réclamation a été traitée avec soin, et nous espérons que la solution apportée répond pleinement à vos attentes.</p>
+                            <p>Vos commentaires et suggestions sont précieux pour nous permettre de mieux répondre à vos besoins à l'avenir.</p>
+                            <h4 class="text-center">Ce formulaire est rapide et ne prendra que quelques minutes</h4>
+                            
+                            <!-- Satisfaction Form -->
+                            <form action="/satisfaction/submit" method="post">
+                                <div class="form-group">
+                                    <label for="nom_reclament">Nom du réclamant</label>
+                                    <input type="text" class="form-control" id="nom_reclament" name="nom_reclament" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="prenom_reclament">Prénom du réclamant</label>
+                                    <input type="text" class="form-control" id="prenom_reclament" name="prenom_reclament" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="reference_reclamation">Référence de la Réclamation</label>
+                                    <input type="text" class="form-control" id="reference_reclamation" name="reference_reclamation" />
+                                </div>
+                                
+                                <!-- Clarity of Explanation -->
+                                <div class="form-group">
+                                    <label>Clarté des explications fournies</label>
+                                    <select class="form-control" name="clarity" >
+                                        <option value="5">⭐⭐⭐⭐⭐ - Très clair</option>
+                                        <option value="4">⭐⭐⭐⭐ - Clair</option>
+                                        <option value="3">⭐⭐⭐ - Acceptable</option>
+                                        <option value="2">⭐⭐ - Peu clair</option>
+                                        <option value="1">⭐ - Pas du tout clair</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Délai de Traitement</label>
+                                    <select class="form-control" name="treatment_time" >
+                                        <option value="very_fast">Très rapide (moins de 24h)</option>
+                                        <option value="fast">Rapide (1-3 jours)</option>
+                                        <option value="acceptable">Long (plus d\'une semaine)</option>
+                                        <option value="slow">Long (plus d\'une semaine)r</option>
+                                        <option value="very_slow">Très long (plus de 2 semaines)</option>
+                                    </select>
+                                </div>
+                                
+
+                                <!-- Solution Quality -->
+                                <div class="form-group">
+                                    <label>Qualité de la solution apportée</label>
+                                    <select class="form-control" name="solution_quality" >
+                                        <option value="very_satisfied">Très satisfait</option>
+                                        <option value="satisfied">Satisfait</option>
+                                        <option value="neutral">Neutre</option>
+                                        <option value="dissatisfied">Insatisfait</option>
+                                        <option value="very_dissatisfied">Très insatisfait</option>
+                                    </select>
+                                </div>
+
+                                <!-- Professionalism -->
+                                <div class="form-group">
+                                    <label>Amabilité et professionnalisme du personnel</label>
+                                    <select class="form-control" name="professionalism" >
+                                        <option value="5">⭐⭐⭐⭐⭐ - Excellent</option>
+                                        <option value="4">⭐⭐⭐⭐ - Bon</option>
+                                        <option value="3">⭐⭐⭐ - Moyen</option>
+                                        <option value="2">⭐⭐ - À améliorer</option>
+                                        <option value="1">⭐ - Mauvais</option>
+                                    </select>
+                                </div>
+
+                                <!-- Recommendations -->
+                                <div class="form-group">
+                                    <label>Recommanderiez-vous notre service ?</label>
+                                    <select class="form-control" name="recommend" >
+                                        <option value="yes">Oui</option>
+                                        <option value="maybe">Peut-être</option>
+                                        <option value="no">Non</option>
+                                    </select>
+                                </div>
+
+                                <!-- Comments -->
+                                <div class="form-group">
+                                    <label for="comments">Comment pouvons-nous améliorer notre service ?</label>
+                                    <textarea class="form-control" id="comments" name="comments" rows="3"></textarea>
+                                </div>
+
+                                <!-- Consent Checkbox -->
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="consent" name="consent" ></input>
+                                    <label class="form-check-label" for="consent">J'accepte que mon retour soit utilisé anonymement</label>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary btn-block">Envoyer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+<data>
+    <record id="view_reclamation_stats_graph" model="ir.ui.view">
+    <field name="name">reclamation.stats.graph</field>
+    <field name="model">reclamation.dashboard</field>
+    <field name="arch" type="xml">
+   
+                <graph string="Réclamations par Type et Origine">
+                    <field name="dynamic_row" type="row"/>
+                    <field name="dynamic_measure" type="measure"/>
+                </graph>
+          
+    </field>
+    </record>
+    <record id="view_stat_search" model="ir.ui.view">
+            <field name="name">reclamation.dashboard.search</field>
+            <field name="model">reclamation.dashboard</field>
+            <field name="arch" type="xml">
+                <search>
+                    <group expand="1" string="Group by Type2">
+                        <filter name="group_by_type2" string="Type des réclamations" context="{'group_by': 'type2'}"/>
+                    </group>
+                    <group expand="1" string="Group by traitement">
+                        <filter name="group_by_archived" string="Traitement des réclamations" context="{'group_by': 'archived'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+<record id="view_reclamation_stats_form" model="ir.ui.view">
+    <field name="name">reclamation.stats.form</field>
+    <field name="model">reclamation.dashboard</field>
+    <field name="arch" type="xml">
+        <form string="Réclamations Dashboard">
+            <header>
+                <button name="toggle_view_mode" type="object" class="oe_highlight" string="Toggle View"/>
+            </header>
+            <sheet>
+                <group>
+                    <field name="view_mode"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+
+           
+           
+        </data>
+        <record id="action_reclamation_dashboard" model="ir.actions.act_window">
+<field name="name">Dashboard des Réclamations</field>
+        <field name="res_model">reclamation.dashboard</field>
+        <field name="view_mode">graph,form,search</field>
+        </record>
+        
+        
+        <template id="reclamation_succes_template" name="Page success reclamation">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+            <h3>Votre réclamation a été soumise avec succès !</h3>
+                       <p>Nous vous remercions de votre soumission. Un accusé de réception a été généré et vous pouvez le télécharger ci-dessous.</p>
+                      <p>Nous traiterons votre demande dans les plus brefs délais. Si vous avez des questions supplémentaires, n'hésitez pas à nous contacter.</p>
+                <div class="text-center mt-3">
+                <a class="btn btn-primary" href="/reclamation/download_report">Télécharger l'accusé de réception</a>
+                </div>
+
+            </div>
+        </t>
+</template>
+<template id="satisfaction_succes_template" name="Page submit satisfaction">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                       <p>Nous vous remercions d'avoir pris le temps de répondre à notre enquête de satisfaction. </p>
+                      <p>Votre avis est précieux pour nous et nous aide à améliorer nos services.</p>
+
+            </div>
+        </t>
+</template>
+<!-- Menu Structure -->
+        <menuitem id="menu_survey_custom" 
+                  name="El Djazayer" 
+                  sequence="10"
+                  groups="survey.group_survey_user"/>
+
+        <menuitem id="menu_interventions"
+                  name="Interventions"
+                  parent="menu_survey_custom"
+                  sequence="4"/>
+
+        <menuitem id="interventions" 
+                  name="interventions et reclamation" 
+                  parent="menu_interventions" 
+                  action="action_intervention"
+                  sequence="6"/>
+
+        <menuitem id="menu_reclamation" 
+                  name="Réclamations"
+                  parent="menu_survey_custom" 
+                  action="action_reclamation_list" 
+                  sequence="3"/>
+
+        <menuitem id="menu_stat"
+          name="Statistiques"
+          action="action_reclamation_graph"
+          parent="menu_survey_custom"/>
+
+          <menuitem id="menu_satisfaction"
+          name="Satisfaction"
+          action="action_satisfaction"
+          parent="menu_survey_custom"/>
+    </data>
+</odoo>

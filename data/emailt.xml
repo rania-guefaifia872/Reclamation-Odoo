@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="email_template_satisfaction_reclamation" model="mail.template">
+            <field name="name">Résolution de Réclamation</field>
+            <field name="model_id" ref="model_project_project"/>
+            <field name="subject">Réclamation "{{ object.objet or 'Sans objet' }}" a été résolue</field>
+            <field name="email_from">kr.guefaifia@esi.dz</field>
+            <field name="email_to">${object.adresse_mail}</field>
+            <field name="body_html" type="html">
+         
+<p>Bonjour,</p> <p>La réclamation mentionnée dans l'objet de cet e-mail a été résolue.</p>
+<p>${object.pv}</p> <p>Nous vous invitons à remplir ce formulaire de satisfaction afin de nous faire part de votre retour :</p> <p><a href="http://localhost:8069/reclamation/satisfaction">Remplir le formulaire</a></p> <p>Merci pour votre collaboration.</p>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,14 @@
+<odoo>
+        <record id="group_manager_1" model="res.groups">
+            <field name="name">Survey / Manager</field>
+        </record>
+
+
+        <record id="reclamation.group_team_intervention" model="res.groups">
+            <field name="name"> intervention projet  </field>
+        </record>
+         <record id="reclamation.group_respo_intervention" model="res.groups">
+            <field name="name"> Cheffe de projet </field>
+            <field name="implied_ids" eval="[(4, ref('reclamation.group_team_intervention'))]"/>
+        </record>
+</odoo>
